@@ -13,7 +13,7 @@ fn set_status(msg: &str) {
 pub mod gpu;
 
 use std::sync::Arc;
-use std::time::Instant;
+use web_time::Instant;
 use wgpu::util::DeviceExt;  // create_buffer_init()
 use winit::{
     application::ApplicationHandler,
