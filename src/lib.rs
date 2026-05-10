@@ -1,6 +1,15 @@
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 
+#[cfg(target_arch = "wasm32")]
+fn set_status(msg: &str) {
+    if let Some(doc) = web_sys::window().and_then(|w| w.document()) {
+        if let Some(el) = doc.get_element_by_id("status") {
+            el.set_text_content(Some(msg));
+        }
+    }
+}
+
 pub mod gpu;
 
 use std::sync::Arc;
@@ -282,6 +291,7 @@ impl State
 
 pub struct App
 {
+    window: Option<Arc<Window>>,
     #[cfg(not(target_arch = "wasm32"))]
     state: Option<State>,
     #[cfg(target_arch = "wasm32")]
@@ -293,6 +303,7 @@ impl App
     pub fn new() -> Self
     {
         Self {
+            window: None,
             #[cfg(not(target_arch = "wasm32"))]
             state: None,
             #[cfg(target_arch = "wasm32")]
@@ -324,6 +335,7 @@ impl ApplicationHandler for App
                 )
                 .unwrap(),
         );
+        self.window = Some(window.clone());
 
         // wasm: inject canvas into DOM before async init
         #[cfg(target_arch = "wasm32")]
@@ -349,8 +361,10 @@ impl ApplicationHandler for App
         {
             let cell   = self.state.clone();
             let window = window.clone();
+            set_status("Loading renderer\u{2026}");
             wasm_bindgen_futures::spawn_local(async move {
                 let state = State::new(window.clone()).await;
+                set_status("Renderer ready.");
                 *cell.borrow_mut() = Some(state);
                 window.request_redraw();
             });
@@ -374,7 +388,10 @@ impl ApplicationHandler for App
             // RedrawRequested: we ask for this at the top of render() to create render loop without busy waiting
             // lets us do work btwn frames
             WindowEvent::RedrawRequested => {
-                self.with_state(|state| { let _ = state.render(); });
+                if self.with_state(|state| { let _ = state.render(); }).is_none() {
+                    // state not ready yet — keep the loop alive so render starts immediately once it is
+                    if let Some(w) = &self.window { w.request_redraw(); }
+                }
             }
 
             WindowEvent::KeyboardInput {
