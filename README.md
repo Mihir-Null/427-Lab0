@@ -1,5 +1,7 @@
 # CMSC427 Lab 00 Report: Parametric Curves
 
+**Live demo:** https://mihir-null.github.io/427-Lab0/
+
 This lab was implemented both in P5.js as well as in Rust with wgpu and winit. It was initially done in P5.js and then redone (albeit more simply) in wbgpu and rust as I learned that I found developing in webgl and javascript extremely painful. It ports over the parametric curve exercise by outlining a complete pipeline by generating curve vertices on the CPU, uploading them to a GPU vertex buffer, and drawing them with a line-strip pipeline, though only the make_rose_curve function and shader definition are relevant to the lab exercises. The rest of the code is the pipeline infrastructure necessary for wgpu and is largely boilerplate but has been annotated as well. 
 
 I extensively used this [tutorial](https://sotrh.github.io/learn-wgpu/) and code contained therein to learn wgpu and implement all the labs. AI tools were used for understanding and mapping  but were not used for coding. VSCode extensions were used for linting and formatting.
