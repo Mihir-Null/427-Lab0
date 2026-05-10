@@ -1,16 +1,11 @@
 [package]
-name    = "lab0"
-version = "0.1.0"
-edition = "2021"
+name      = "lab0"
+version   = "0.1.0"
+edition   = "2021"
+autobins  = false  # suppress bin target so Trunk only sees the cdylib, avoids wasm filename collision
 
-# split into lib + bin like the later labs, so we can have a thin main.rs
-# and put all the real code in lib.rs
 [lib]
 crate-type = ["cdylib", "rlib"]
-
-[[bin]]
-name = "lab0"
-path = "src/main.rs"
 
 [dependencies]
 wgpu     = "29.0.1"
