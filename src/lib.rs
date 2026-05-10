@@ -214,14 +214,6 @@ impl State
         // schedules redraws, winit doesn't do it for us
         self.window.request_redraw();
 
-        // guard: surface.get_current_texture() would panic before configure()
-        // on WASM, winit doesn't fire Resized at startup so we configure here on first render
-        if !self.gpu.is_configured {
-            let s = self.window.inner_size();
-            self.gpu.resize(s.width, s.height);
-            if !self.gpu.is_configured { return Ok(()); }
-        }
-
         // compute geometry on CPU each frame, then push to GPU buffer
         let t = self.start_time.elapsed().as_secs_f32();
         let verts = make_rose_curve(5, 2000, t);
@@ -328,6 +320,7 @@ impl ApplicationHandler for App
                 .create_window(
                     Window::default_attributes()
                         .with_title("CMSC427 Lab 00 – Rose Curve")
+                        .with_inner_size(winit::dpi::PhysicalSize::new(720u32, 720u32))
                 )
                 .unwrap(),
         );
